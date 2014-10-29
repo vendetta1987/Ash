@@ -1,5 +1,6 @@
 package ash.tools
 {
+
 	import ash.core.Engine;
 	import ash.core.Node;
 	import ash.core.NodeList;
@@ -10,7 +11,7 @@ package ash.tools
 	 * class removes the need for a lot of boilerplate code in such systems. Extend this class and pass the node type and
 	 * a node update method into the constructor. The node update method will be called once per node on the update cycle
 	 * with the node instance and the frame time as parameters. e.g.
-	 * 
+	 *
 	 * <code>package
 	 * {
 	 *   public class MySystem extends ListIteratingSystem
@@ -29,55 +30,58 @@ package ash.tools
 	 */
 	public class ListIteratingSystem extends System
 	{
-		protected var nodeList : NodeList;
-		protected var nodeClass : Class;
-		protected var nodeUpdateFunction : Function;
-		protected var nodeAddedFunction : Function;
-		protected var nodeRemovedFunction : Function;
-		
-		public function ListIteratingSystem( nodeClass : Class, nodeUpdateFunction : Function, nodeAddedFunction : Function = null, nodeRemovedFunction : Function = null )
+		protected var nodeList:NodeList;
+		protected var nodeClass:Class;
+		protected var nodeUpdateFunction:Function;
+		protected var nodeAddedFunction:Function;
+		protected var nodeRemovedFunction:Function;
+
+		public function ListIteratingSystem( nodeClass:Class, nodeUpdateFunction:Function = null, nodeAddedFunction:Function = null, nodeRemovedFunction:Function = null )
 		{
 			this.nodeClass = nodeClass;
 			this.nodeUpdateFunction = nodeUpdateFunction;
 			this.nodeAddedFunction = nodeAddedFunction;
 			this.nodeRemovedFunction = nodeRemovedFunction;
 		}
-		
-		override public function addToEngine( engine : Engine ) : void
+
+		override public function addToEngine( engine:Engine ):void
 		{
 			nodeList = engine.getNodeList( nodeClass );
-			if( nodeAddedFunction != null )
+			if (nodeAddedFunction != null)
 			{
-				for( var node : Node = nodeList.head; node; node = node.next )
+				for (var node:Node = nodeList.head; node; node = node.next)
 				{
 					nodeAddedFunction( node );
 				}
 				nodeList.nodeAdded.add( nodeAddedFunction );
 			}
-			if( nodeRemovedFunction != null )
+			if (nodeRemovedFunction != null)
 			{
 				nodeList.nodeRemoved.add( nodeRemovedFunction );
 			}
 		}
-		
-		override public function removeFromEngine( engine : Engine ) : void
+
+		override public function removeFromEngine( engine:Engine ):void
 		{
-			if( nodeAddedFunction != null )
+			if (nodeAddedFunction != null)
 			{
 				nodeList.nodeAdded.remove( nodeAddedFunction );
 			}
-			if( nodeRemovedFunction != null )
+			if (nodeRemovedFunction != null)
 			{
 				nodeList.nodeRemoved.remove( nodeRemovedFunction );
 			}
 			nodeList = null;
 		}
-		
-		override public function update( time : Number ) : void
+
+		override public function update( time:Number ):void
 		{
-			for( var node : Node = nodeList.head; node; node = node.next )
+			if (nodeUpdateFunction != null)
 			{
-				nodeUpdateFunction( node, time );
+				for (var node:Node = nodeList.head; node; node = node.next)
+				{
+					nodeUpdateFunction( node, time );
+				}
 			}
 		}
 	}
